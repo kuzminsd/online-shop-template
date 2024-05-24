@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShop.Api", "OnlineShop.Api\OnlineShop.Api.csproj", "{BE69C928-FA43-4D2B-9013-21ED449E81A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShop.Persistence", "OnlineShop.Persistence\OnlineShop.Persistence.csproj", "{7A0E466A-7457-45AE-9225-E332EACCAD3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShop.Domain", "OnlineShop.Domain\OnlineShop.Domain.csproj", "{DBDEDBD6-EA48-4536-A661-D7D09F46AE1F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{362BFF71-757E-48E6-BD9C-C36F54AEA1C4}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShop.Application", "OnlineShop.Application\OnlineShop.Application.csproj", "{BA9F54FA-6B1B-494A-B985-7D95739CFD13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE69C928-FA43-4D2B-9013-21ED449E81A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE69C928-FA43-4D2B-9013-21ED449E81A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE69C928-FA43-4D2B-9013-21ED449E81A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE69C928-FA43-4D2B-9013-21ED449E81A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A0E466A-7457-45AE-9225-E332EACCAD3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A0E466A-7457-45AE-9225-E332EACCAD3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A0E466A-7457-45AE-9225-E332EACCAD3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A0E466A-7457-45AE-9225-E332EACCAD3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBDEDBD6-EA48-4536-A661-D7D09F46AE1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBDEDBD6-EA48-4536-A661-D7D09F46AE1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBDEDBD6-EA48-4536-A661-D7D09F46AE1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBDEDBD6-EA48-4536-A661-D7D09F46AE1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA9F54FA-6B1B-494A-B985-7D95739CFD13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA9F54FA-6B1B-494A-B985-7D95739CFD13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA9F54FA-6B1B-494A-B985-7D95739CFD13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA9F54FA-6B1B-494A-B985-7D95739CFD13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

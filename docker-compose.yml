@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  online-shop-db:
+    image: "postgres:15.5"
+    ports:
+      - "5482:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: "OnlineShop"
+    volumes:
+      - c:\dev\docker-data\online-shop\:/var/lib/postgresql/data

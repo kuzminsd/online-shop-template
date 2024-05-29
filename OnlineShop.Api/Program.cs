@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using OnlineShop.Api.Helpers;
 using OnlineShop.Application.Contracts;
 using OnlineShop.Application.Contracts.Data;
 using OnlineShop.Application.Models;
@@ -14,20 +15,26 @@ var useHttp2 = builder.Configuration.GetValue<bool>("ApplicationSettings:UseHttp
 
 if (useHttp2)
 {
-    builder.WebHost.ConfigureKestrel((options) =>
+    builder.WebHost.ConfigureKestrel(options =>
     {
         options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http2);
     });
 }
 
 // Add services to the container.
-builder.Services.AddDbContext<OnlineShopDbContext>(q => q
-    .UseNpgsql(builder.Configuration.GetConnectionString("OnlineShop")));
+builder.Services.AddDbContext<OnlineShopDbContext>(q =>
+{
+    q.UseNpgsql(builder.Configuration.GetConnectionString("OnlineShop"), options =>
+    {
+        options.EnableRetryOnFailure(3);
+    });
+});
 
 builder.Services
     .AddOptions<ExternalPaymentServiceOptions>()
     .Bind(builder.Configuration.GetSection(nameof(ExternalPaymentServiceOptions)));
-    
+
+builder.Services.AddScoped<DbMaintenanceService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
@@ -76,4 +83,5 @@ app.MapPost("/orders/{orderId}/payment",
     .WithName("Start Payment")
     .WithOpenApi();
 
+app.PrepareDatabase();
 app.Run();

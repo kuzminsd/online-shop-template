@@ -9,24 +9,24 @@ namespace OnlineShop.Application.Services;
 
 public class OrderService(IOrderRepository orderRepository, IPaymentService paymentService): IOrderService
 {
-    public OrderInfo CreateOrder(Guid userId, decimal price)
+    public async Task<OrderInfo> CreateOrder(Guid userId, decimal price, CancellationToken cancellationToken)
     {
-        var order = orderRepository.Create(userId, price);
+        var order = await orderRepository.Create(userId, price, cancellationToken);
 
         return ConvertToOrderInfo(order);
     }
 
-    public OrderInfo GetOrderInfo(Guid orderId)
+    public async Task<OrderInfo> GetOrderInfo(Guid orderId, CancellationToken cancellationToken)
     {
-        var order = orderRepository.Get(orderId);
+        var order = await orderRepository.Get(orderId, cancellationToken);
         
         return ConvertToOrderInfo(order);
     }
 
-    public StartPaymentResponse StartPayment(Guid orderId)
+    public async Task<StartPaymentResponse> StartPayment(Guid orderId, CancellationToken cancellationToken)
     {
-        var payment = orderRepository.CreatePayment(orderId);
-        paymentService.Pay(payment.Id);
+        var payment = await orderRepository.CreatePayment(orderId, cancellationToken);
+        await paymentService.Pay(payment.Id, cancellationToken);
         
         return new StartPaymentResponse(payment.CreatedAt.ToTimeMilliseconds(), payment.Id);
     }

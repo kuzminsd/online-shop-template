@@ -14,28 +14,28 @@ public class PaymentService(
     private const string ServiceName = "test";
     private const string AccountName = "default-1";
 
-    public void Pay(Guid paymentId)
+    public async Task Pay(Guid paymentId, CancellationToken cancellationToken)
     {
         try
         {
             var url =
                 $"{httpClientOptions.Value.BaseAddress}external/process?serviceName={ServiceName}&accountName={AccountName}&transactionId={paymentId}";
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
-            var response = httpClient.Send(httpRequest);
+            var response = await httpClient.SendAsync(httpRequest, cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                orderRepository.SetPaymentSuccess(paymentId);
+                await orderRepository.SetPaymentSuccess(paymentId, cancellationToken);
 
             }
             else
             {
-                orderRepository.SetPaymentFailed(paymentId);
+                await orderRepository.SetPaymentFailed(paymentId, cancellationToken);
             }
         }
         catch
         {
-            orderRepository.SetPaymentFailed(paymentId);
+            await orderRepository.SetPaymentFailed(paymentId, cancellationToken);
         }
     }
 }

@@ -64,21 +64,21 @@ app.MapPost("/authentication", ([FromBody]AuthenticationRequest request)
     .WithName("Authentication")
     .WithOpenApi();
 
-app.MapPost("/orders", (IOrderService orderService, [FromQuery] Guid userId, [FromQuery] decimal price) 
-        => orderService.CreateOrder(userId, price))
+app.MapPost("/orders", (IOrderService orderService, [FromQuery] Guid userId, [FromQuery] decimal price, CancellationToken cancellationToken) 
+        => orderService.CreateOrder(userId, price, cancellationToken))
     .WithTags("Orders")
     .WithName("Create Order")
     .WithOpenApi();
 
-app.MapGet("/orders/{orderId}", (IOrderService orderService, [FromRoute] Guid orderId) 
-        => orderService.GetOrderInfo(orderId))
+app.MapGet("/orders/{orderId}", (IOrderService orderService, [FromRoute] Guid orderId, CancellationToken cancellationToken) 
+        => orderService.GetOrderInfo(orderId, cancellationToken))
     .WithTags("Orders")
     .WithName("Get Order Info")
     .WithOpenApi();
 
 app.MapPost("/orders/{orderId}/payment", 
-        (IOrderService orderService, [FromRoute] Guid orderId)
-            => orderService.StartPayment(orderId))
+        (IOrderService orderService, [FromRoute] Guid orderId, CancellationToken cancellationToken)
+            => orderService.StartPayment(orderId, cancellationToken))
     .WithTags("Orders")
     .WithName("Start Payment")
     .WithOpenApi();

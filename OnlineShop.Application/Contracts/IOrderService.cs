@@ -4,9 +4,9 @@ namespace OnlineShop.Application.Contracts;
 
 public interface IOrderService
 {
-    OrderInfo CreateOrder(Guid userId, decimal price);
+    Task<OrderInfo> CreateOrder(Guid userId, decimal price, CancellationToken cancellationToken);
     
-    OrderInfo GetOrderInfo(Guid orderId);
+    Task<OrderInfo> GetOrderInfo(Guid orderId, CancellationToken cancellationToken);
     
-    StartPaymentResponse StartPayment(Guid orderId);
+    Task<StartPaymentResponse> StartPayment(Guid orderId, CancellationToken cancellationToken);
 }

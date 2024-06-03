@@ -7,7 +7,7 @@ namespace OnlineShop.Persistence.Repositories;
 
 public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
 {
-    public Order Create(Guid userId, decimal price)
+    public async Task<Order> Create(Guid userId, decimal price, CancellationToken cancellationToken)
     {
         var order = new Order
         {
@@ -17,21 +17,21 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
             UserId = userId
         };
 
-        dbContext.Orders.Add(order);
-        dbContext.SaveChanges();
+        await dbContext.Orders.AddAsync(order, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return order;
     }
 
-    public Order Get(Guid orderId)
+    public async Task<Order> Get(Guid orderId, CancellationToken cancellationToken)
     {
-        return dbContext.Orders
+        return await dbContext.Orders
             .Include(x => x.PaymentHistory)
-            .First(x => x.Id == orderId);
+            .FirstAsync(x => x.Id == orderId, cancellationToken);
     }
 
-    public Payment CreatePayment(Guid orderId)
+    public async Task<Payment> CreatePayment(Guid orderId, CancellationToken cancellationToken)
     {
-        var order = dbContext.Orders.First(x => x.Id == orderId);
+        var order = await dbContext.Orders.FirstAsync(x => x.Id == orderId, cancellationToken);
 
         order.Status = OrderStatus.PaymentInProgress;
         
@@ -43,35 +43,35 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
             Status = PaymentStatus.Created
         };
 
-        dbContext.Payments.Add(payment);
-        dbContext.SaveChanges();
+        await dbContext.Payments.AddAsync(payment, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return payment;
     }
 
-    public Payment SetPaymentSuccess(Guid paymentId)
+    public async Task<Payment> SetPaymentSuccess(Guid paymentId, CancellationToken cancellationToken)
     {
-        var payment = dbContext.Payments
+        var payment = await dbContext.Payments
             .Include(x => x.Order)
-            .First(x => x.Id == paymentId);
+            .FirstAsync(x => x.Id == paymentId, cancellationToken);
 
         payment.Status = PaymentStatus.Success;
         payment.PaymentFinishedAt = DateTime.UtcNow;
         payment.Order.Status = OrderStatus.Payed;
         
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return payment;
     }
 
-    public Payment SetPaymentFailed(Guid paymentId)
+    public async Task<Payment> SetPaymentFailed(Guid paymentId, CancellationToken cancellationToken)
     {
-        var payment = dbContext.Payments.First(x => x.Id == paymentId);
+        var payment = await dbContext.Payments.FirstAsync(x => x.Id == paymentId, cancellationToken);
 
         payment.Status = PaymentStatus.Failed;
         payment.PaymentFinishedAt = DateTime.UtcNow;
         
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return payment;
     }

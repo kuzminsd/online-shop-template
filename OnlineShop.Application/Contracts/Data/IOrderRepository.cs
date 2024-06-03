@@ -1,17 +1,16 @@
 ﻿using OnlineShop.Domain.Models;
-using OnlineShop.Domain.ValueTypes;
 
 namespace OnlineShop.Application.Contracts.Data;
 
 public interface IOrderRepository
 {
-    Order Create(Guid userId, decimal price);
+    Task<Order> Create(Guid userId, decimal price, CancellationToken cancellationToken);
 
-    Order Get(Guid orderId);
+    Task<Order> Get(Guid orderId, CancellationToken cancellationToken);
 
-    Payment CreatePayment(Guid orderId);
+    Task<Payment> CreatePayment(Guid orderId, CancellationToken cancellationToken);
     
-    Payment SetPaymentSuccess(Guid paymentId);
+    Task<Payment> SetPaymentSuccess(Guid paymentId, CancellationToken cancellationToken);
     
-    Payment SetPaymentFailed(Guid paymentId);
+    Task<Payment> SetPaymentFailed(Guid paymentId, CancellationToken cancellationToken);
 }

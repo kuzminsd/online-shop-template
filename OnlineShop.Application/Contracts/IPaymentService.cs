@@ -2,5 +2,5 @@
 
 public interface IPaymentService
 {
-    void Pay(Guid paymentId);
+    Task Pay(Guid paymentId, CancellationToken cancellationToken);
 }

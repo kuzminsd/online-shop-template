@@ -63,6 +63,21 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
 
         return payment;
     }
+    
+    public async Task<Payment> SetPaymentSubmitted(Guid paymentId, CancellationToken cancellationToken)
+    {
+        var payment = await dbContext.Payments
+            .Include(x => x.Order)
+            .FirstAsync(x => x.Id == paymentId, cancellationToken);
+
+        payment.Status = PaymentStatus.Submitted;
+        payment.PaymentFinishedAt = DateTime.UtcNow;
+        payment.Order.Status = OrderStatus.Payed;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return payment;
+    }
 
     public async Task<Payment> SetPaymentFailed(Guid paymentId, CancellationToken cancellationToken)
     {
@@ -74,5 +89,23 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return payment;
+    }
+
+    public async Task<IReadOnlyCollection<Payment>> GetPaymentsForProcessing(CancellationToken cancellationToken)
+    {
+        var payments =  dbContext
+            .Payments
+            .Where(x => x.Status == PaymentStatus.Created)
+            .OrderBy(x => x.CreatedAt)
+            .ToList();
+
+        foreach (var payment in payments)
+        {
+            payment.Status = PaymentStatus.Processing;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return payments;
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using OnlineShop.Api.Helpers;
+using OnlineShop.Api.HostedServices;
 using OnlineShop.Application.Contracts;
 using OnlineShop.Application.Contracts.Data;
 using OnlineShop.Application.Models;
@@ -38,7 +39,9 @@ builder.Services.AddScoped<DbMaintenanceService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentsProcessingService, PaymentsProcessingService>();
 builder.Services.AddHttpClient();
+builder.Services.AddHostedService<PaymentsHostedService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

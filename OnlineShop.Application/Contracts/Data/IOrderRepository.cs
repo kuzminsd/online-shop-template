@@ -10,7 +10,7 @@ public interface IOrderRepository
 
     Task<Payment> CreatePayment(Guid orderId, CancellationToken cancellationToken);
     
-    Task<Payment> SetPaymentSubmitted(Guid paymentId, CancellationToken cancellationToken);
+    Task<Payment> SetPaymentProcessing(Guid paymentId, CancellationToken cancellationToken);
     
     Task<Payment> SetPaymentSuccess(Guid paymentId, CancellationToken cancellationToken);
     

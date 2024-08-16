@@ -20,10 +20,10 @@ public class PaymentService(
     {
         try
         {
-            await orderRepository.SetPaymentSubmitted(paymentId, cancellationToken);
+            await orderRepository.SetPaymentProcessing(paymentId, cancellationToken);
             
             var url =
-                $"{httpClientOptions.Value.BaseAddress}external/process?serviceName={ServiceName}&accountName={AccountName}&transactionId={paymentId}";
+                $"{httpClientOptions.Value.BaseAddress}external/process?serviceName={ServiceName}&accountName={AccountName}&transactionId={paymentId}&paymentId={paymentId}";
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
             var response = await httpClient.SendAsync(httpRequest, cancellationToken);
 
@@ -41,6 +41,23 @@ public class PaymentService(
         {
             logger.LogError("Payment {paymentId} failed: {message}", paymentId, ex.Message);
             await orderRepository.SetPaymentFailed(paymentId, cancellationToken);
+        }
+    }
+
+    public async Task ProcessPayments(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var payments = await orderRepository.GetPaymentsForProcessing(cancellationToken);
+
+            foreach (var payment in payments)
+            {
+                await Pay(payment.Id, cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Payments processing failed: {message}", ex.Message);
         }
     }
 }

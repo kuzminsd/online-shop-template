@@ -39,7 +39,6 @@ builder.Services.AddScoped<DbMaintenanceService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IPaymentsProcessingService, PaymentsProcessingService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<PaymentsHostedService>();
 

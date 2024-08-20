@@ -15,6 +15,7 @@
         <PackageReference Include="prometheus-net" />
         <PackageReference Include="prometheus-net.AspNetCore" />
         <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" />
+        <PackageReference Include="prometheus-net.DotNetRuntime" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
     </ItemGroup>
 

@@ -2,5 +2,5 @@
 
 public class ExternalPaymentServiceOptions
 {
-    public string BaseAddress { get; set; }
+    public required string BaseAddress { get; set; }
 }

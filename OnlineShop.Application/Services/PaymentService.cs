@@ -14,7 +14,7 @@ public class PaymentService(
     ILogger<PaymentService> logger) : IPaymentService
 {
     private const string ServiceName = "test";
-    private const string AccountName = "default-1";
+    private const string AccountName = "test-account";
 
     public async Task Pay(Guid paymentId, CancellationToken cancellationToken)
     {

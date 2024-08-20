@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineShop.Api.Helpers;
 using OnlineShop.Api.HostedServices;
+using OnlineShop.Api.Options;
 using OnlineShop.Application.Contracts;
 using OnlineShop.Application.Contracts.Data;
 using OnlineShop.Application.Models;
@@ -32,12 +33,17 @@ builder.Services
     .AddOptions<ExternalPaymentServiceOptions>()
     .Bind(builder.Configuration.GetSection(nameof(ExternalPaymentServiceOptions)));
 
+builder.Services
+    .AddOptions<MetricOptions>()
+    .Bind(builder.Configuration.GetSection(nameof(MetricOptions)));
+
 builder.Services.AddScoped<DbMaintenanceService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<PaymentsHostedService>();
+builder.Services.AddHostedService<MetricsHostedService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -54,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapMetrics();
+app.MapMetrics("/actuator/prometheus");
 
 app.MapPost("/users", (CreateUserRequest request) => new UserInfo(Guid.NewGuid(), request.Name))
     .WithTags("Users")

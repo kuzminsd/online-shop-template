@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using OnlineShop.Api.Helpers;
 using OnlineShop.Api.HostedServices;
@@ -10,8 +9,15 @@ using OnlineShop.Application.Options;
 using OnlineShop.Application.Services;
 using OnlineShop.Persistence;
 using OnlineShop.Persistence.Repositories;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddHealthChecks()
+    .ForwardToPrometheus();
+
+builder.Services.UseHttpClientMetrics();
 
 // Add services to the container.
 builder.Services.AddDbContext<OnlineShopDbContext>(q =>
@@ -39,12 +45,16 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseHttpMetrics();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapMetrics();
 
 app.MapPost("/users", (CreateUserRequest request) => new UserInfo(Guid.NewGuid(), request.Name))
     .WithTags("Users")

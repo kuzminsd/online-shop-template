@@ -12,15 +12,6 @@ using OnlineShop.Persistence;
 using OnlineShop.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-var useHttp2 = builder.Configuration.GetValue<bool>("ApplicationSettings:UseHttp2");
-
-if (useHttp2)
-{
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http2);
-    });
-}
 
 // Add services to the container.
 builder.Services.AddDbContext<OnlineShopDbContext>(q =>

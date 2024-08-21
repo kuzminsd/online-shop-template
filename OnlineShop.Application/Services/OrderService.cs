@@ -7,7 +7,7 @@ using OnlineShop.Domain.ValueTypes;
 
 namespace OnlineShop.Application.Services;
 
-public class OrderService(IOrderRepository orderRepository, IPaymentService paymentService): IOrderService
+public class OrderService(IOrderRepository orderRepository): IOrderService
 {
     public async Task<OrderInfo> CreateOrder(Guid userId, decimal price, CancellationToken cancellationToken)
     {

@@ -49,6 +49,20 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
         return payment;
     }
 
+    public async Task<Payment> SetPaymentProcessing(Guid paymentId, CancellationToken cancellationToken)
+    {
+        var payment = await dbContext.Payments
+            .Include(x => x.Order)
+            .FirstAsync(x => x.Id == paymentId, cancellationToken);
+
+        payment.Status = PaymentStatus.Processing;
+        payment.PaymentFinishedAt = DateTime.UtcNow;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return payment;
+    }
+
     public async Task<Payment> SetPaymentSuccess(Guid paymentId, CancellationToken cancellationToken)
     {
         var payment = await dbContext.Payments
@@ -56,21 +70,6 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
             .FirstAsync(x => x.Id == paymentId, cancellationToken);
 
         payment.Status = PaymentStatus.Success;
-        payment.PaymentFinishedAt = DateTime.UtcNow;
-        payment.Order.Status = OrderStatus.Payed;
-        
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return payment;
-    }
-    
-    public async Task<Payment> SetPaymentSubmitted(Guid paymentId, CancellationToken cancellationToken)
-    {
-        var payment = await dbContext.Payments
-            .Include(x => x.Order)
-            .FirstAsync(x => x.Id == paymentId, cancellationToken);
-
-        payment.Status = PaymentStatus.Submitted;
         payment.PaymentFinishedAt = DateTime.UtcNow;
         payment.Order.Status = OrderStatus.Payed;
         
@@ -93,19 +92,11 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
 
     public async Task<IReadOnlyCollection<Payment>> GetPaymentsForProcessing(CancellationToken cancellationToken)
     {
-        var payments =  dbContext
+        return await dbContext
             .Payments
             .Where(x => x.Status == PaymentStatus.Created)
             .OrderBy(x => x.CreatedAt)
-            .ToList();
-
-        foreach (var payment in payments)
-        {
-            payment.Status = PaymentStatus.Processing;
-        }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return payments;
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

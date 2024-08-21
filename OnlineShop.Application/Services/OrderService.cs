@@ -7,7 +7,7 @@ using OnlineShop.Domain.ValueTypes;
 
 namespace OnlineShop.Application.Services;
 
-public class OrderService(IOrderRepository orderRepository, IPaymentService paymentService): IOrderService
+public class OrderService(IOrderRepository orderRepository): IOrderService
 {
     public async Task<OrderInfo> CreateOrder(Guid userId, decimal price, CancellationToken cancellationToken)
     {
@@ -26,7 +26,6 @@ public class OrderService(IOrderRepository orderRepository, IPaymentService paym
     public async Task<StartPaymentResponse> StartPayment(Guid orderId, CancellationToken cancellationToken)
     {
         var payment = await orderRepository.CreatePayment(orderId, cancellationToken);
-        await paymentService.Pay(payment.Id, cancellationToken);
         
         return new StartPaymentResponse(payment.CreatedAt.ToTimeMilliseconds(), payment.Id);
     }

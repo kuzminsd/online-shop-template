@@ -49,6 +49,20 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
         return payment;
     }
 
+    public async Task<Payment> SetPaymentProcessing(Guid paymentId, CancellationToken cancellationToken)
+    {
+        var payment = await dbContext.Payments
+            .Include(x => x.Order)
+            .FirstAsync(x => x.Id == paymentId, cancellationToken);
+
+        payment.Status = PaymentStatus.Processing;
+        payment.PaymentFinishedAt = DateTime.UtcNow;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return payment;
+    }
+
     public async Task<Payment> SetPaymentSuccess(Guid paymentId, CancellationToken cancellationToken)
     {
         var payment = await dbContext.Payments
@@ -74,5 +88,15 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return payment;
+    }
+
+    public async Task<IReadOnlyCollection<Payment>> GetPaymentsForProcessing(CancellationToken cancellationToken)
+    {
+        return await dbContext
+            .Payments
+            .Where(x => x.Status == PaymentStatus.Created)
+            .OrderBy(x => x.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

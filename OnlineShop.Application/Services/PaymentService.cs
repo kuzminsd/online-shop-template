@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OnlineShop.Application.Contracts;
 using OnlineShop.Application.Contracts.Data;
@@ -9,17 +10,20 @@ namespace OnlineShop.Application.Services;
 public class PaymentService(
     IOrderRepository orderRepository,
     HttpClient httpClient,
-    IOptions<ExternalPaymentServiceOptions> httpClientOptions) : IPaymentService
+    IOptions<ExternalPaymentServiceOptions> httpClientOptions,
+    ILogger<PaymentService> logger) : IPaymentService
 {
     private const string ServiceName = "test";
-    private const string AccountName = "default-1";
+    private const string AccountName = "test-account";
 
     public async Task Pay(Guid paymentId, CancellationToken cancellationToken)
     {
         try
         {
+            await orderRepository.SetPaymentProcessing(paymentId, cancellationToken);
+            
             var url =
-                $"{httpClientOptions.Value.BaseAddress}external/process?serviceName={ServiceName}&accountName={AccountName}&transactionId={paymentId}";
+                $"{httpClientOptions.Value.BaseAddress}external/process?serviceName={ServiceName}&accountName={AccountName}&transactionId={paymentId}&paymentId={paymentId}";
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
             var response = await httpClient.SendAsync(httpRequest, cancellationToken);
 
@@ -33,9 +37,27 @@ public class PaymentService(
                 await orderRepository.SetPaymentFailed(paymentId, cancellationToken);
             }
         }
-        catch
+        catch(Exception ex)
         {
+            logger.LogError("Payment {paymentId} failed: {message}", paymentId, ex.Message);
             await orderRepository.SetPaymentFailed(paymentId, cancellationToken);
+        }
+    }
+
+    public async Task ProcessPayments(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var payments = await orderRepository.GetPaymentsForProcessing(cancellationToken);
+
+            foreach (var payment in payments)
+            {
+                await Pay(payment.Id, cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Payments processing failed: {message}", ex.Message);
         }
     }
 }

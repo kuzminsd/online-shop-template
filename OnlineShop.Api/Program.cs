@@ -21,7 +21,7 @@ builder.Services
 builder.Services.UseHttpClientMetrics();
 
 // Add services to the container.
-builder.Services.AddDbContext<OnlineShopDbContext>(q =>
+builder.Services.AddDbContextPool<OnlineShopDbContext>(q =>
 {
     q.UseNpgsql(builder.Configuration.GetConnectionString("OnlineShop"), options =>
     {

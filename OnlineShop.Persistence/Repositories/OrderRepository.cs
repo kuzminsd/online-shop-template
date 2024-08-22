@@ -56,7 +56,6 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
             .FirstAsync(x => x.Id == paymentId, cancellationToken);
 
         payment.Status = PaymentStatus.Processing;
-        payment.PaymentFinishedAt = DateTime.UtcNow;
         
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -94,9 +93,9 @@ public class OrderRepository(OnlineShopDbContext dbContext) : IOrderRepository
     {
         return await dbContext
             .Payments
+            .AsNoTracking()
             .Where(x => x.Status == PaymentStatus.Created)
             .OrderBy(x => x.CreatedAt)
-            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 }

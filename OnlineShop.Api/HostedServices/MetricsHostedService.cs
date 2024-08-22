@@ -11,7 +11,10 @@ public class MetricsHostedService(IOptions<MetricOptions> metricOptions, ILogger
     
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _collector = CreateCollector(TimeSpan.FromMinutes(20), useDebuggingMetrics: true);
+        _collector = CreateCollector(
+            metricOptions.Value.RecycleEvery,
+            metricOptions.Value.UseDefaultMetrics,
+            metricOptions.Value.UseDebuggingMetrics);
         
         return Task.CompletedTask;
     }

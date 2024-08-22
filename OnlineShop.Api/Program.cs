@@ -53,7 +53,7 @@ builder.Services
         });
 
 // Add services to the container.
-builder.Services.AddDbContextPool<OnlineShopDbContext>(q =>
+builder.Services.AddDbContext<OnlineShopDbContext>(q =>
 {
     q.UseNpgsql(builder.Configuration.GetConnectionString("OnlineShop"), options =>
     {

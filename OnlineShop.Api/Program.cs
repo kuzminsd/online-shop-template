@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OnlineShop.Api.Helpers;
 using OnlineShop.Api.HostedServices;
 using OnlineShop.Api.Options;
@@ -10,15 +11,46 @@ using OnlineShop.Application.Options;
 using OnlineShop.Application.Services;
 using OnlineShop.Persistence;
 using OnlineShop.Persistence.Repositories;
+using OpenTelemetry.Metrics;
 using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy())
     .ForwardToPrometheus();
 
 builder.Services.UseHttpClientMetrics();
+
+builder.Services
+    .AddOpenTelemetry()
+        .WithMetrics(metricsBuilder =>
+        {
+            metricsBuilder
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation();
+            
+            metricsBuilder.AddEventCountersInstrumentation(counters =>
+            {
+                counters.AddEventSources(
+                    //"System.Runtime", //Not available yet.
+                    "System.Net.NameResolution",
+                    "System.Net.Http",
+                    "Microsoft.Extensions.Diagnostics.ResourceMonitoring",
+                    "Microsoft.AspNetCore.Hosting",
+                    "Microsoft.AspNetCore.Routing",
+                    "Microsoft.AspNetCore.Diagnostics",
+                    "Microsoft.AspNetCore.RateLimiting",
+                    "Microsoft.AspNetCore.HeaderParsing",
+                    "Microsoft.AspNetCore.Server.Kestrel",
+                    "Microsoft.AspNetCore.Http.Connections",
+                    "Microsoft.EntityFrameworkCore");
+            });
+            
+            metricsBuilder.AddPrometheusExporter();
+        });
 
 // Add services to the container.
 builder.Services.AddDbContext<OnlineShopDbContext>(q =>
@@ -61,6 +93,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapMetrics("/actuator/prometheus");
+app.MapHealthChecks("/healthz");
 
 app.MapPost("/users", (CreateUserRequest request) => new UserInfo(Guid.NewGuid(), request.Name))
     .WithTags("Users")
